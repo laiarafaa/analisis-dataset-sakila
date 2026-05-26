@@ -1,0 +1,701 @@
+---
+title: Analisis Data Penyewaan Film pada Database Sakila sebagai Dasar Pengambilan
+  Keputusan Manajerial
+author: 'Laia Rafa Sulistyadi | NIM: M0724062 | Kelas: B'
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  html_document:
+    self_contained: false
+    theme: flatly
+    highlight: tango
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+    toc_depth: 3
+    number_sections: true
+    df_print: paged
+    code_folding: show
+  word_document:
+    toc: true
+    toc_depth: '3'
+  pdf_document:
+    toc: true
+    toc_depth: '3'
+---
+
+```{=html}
+<style>
+  /* ── Google Font ── */
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Fira+Code&display=swap');
+
+  /* ── Global ── */
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: #2d3748;
+    background-color: #f7f9fc;
+    line-height: 1.75;
+  }
+
+  /* ── Navbar / TOC ── */
+  .navbar, #TOC {
+    background-color: #1a365d !important;
+    color: #ffffff;
+    border-radius: 8px;
+  }
+  #TOC a { color: #90cdf4; }
+  #TOC a:hover { color: #ffffff; text-decoration: none; }
+
+  /* ── Headings ── */
+  h1, h2, h3, h4 {
+    font-weight: 700;
+    color: #1a365d;
+  }
+  h1.title {
+    font-size: 2.2em;
+    text-align: center;
+    padding: 20px 0 5px;
+    border-bottom: 3px solid #3182ce;
+    color: #1a365d;
+  }
+  h1 { font-size: 1.8em; border-left: 5px solid #3182ce; padding-left: 12px; }
+  h2 { font-size: 1.4em; border-left: 4px solid #63b3ed; padding-left: 10px; }
+  h3 { font-size: 1.15em; color: #2b6cb0; }
+
+  /* ── Author / Date ── */
+  .author, .date {
+    text-align: center;
+    color: #718096;
+    font-size: 0.95em;
+    margin: 2px 0;
+  }
+
+  /* ── Info box ── */
+  .info-box {
+    background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+    border-left: 6px solid #3182ce;
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(49,130,206,0.10);
+  }
+  .info-box p { margin: 0; }
+
+  /* ── Warning box ── */
+  .warning-box {
+    background: #fffbeb;
+    border-left: 6px solid #d69e2e;
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin: 16px 0;
+  }
+
+  /* ── Success box ── */
+  .success-box {
+    background: #f0fff4;
+    border-left: 6px solid #38a169;
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin: 16px 0;
+  }
+
+  /* ── Metric cards ── */
+  .metric-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+  }
+  .metric-card {
+    flex: 1 1 160px;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 18px 20px;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    border-top: 4px solid #3182ce;
+  }
+  .metric-card .value {
+    font-size: 2em;
+    font-weight: 700;
+    color: #1a365d;
+  }
+  .metric-card .label {
+    font-size: 0.82em;
+    color: #718096;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .metric-card.green  { border-top-color: #38a169; }
+  .metric-card.orange { border-top-color: #dd6b20; }
+  .metric-card.purple { border-top-color: #805ad5; }
+
+  /* ── Code blocks ── */
+  pre, code {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.88em;
+    border-radius: 6px;
+  }
+  pre {
+    background: #1e2a3a;
+    color: #e2e8f0;
+    padding: 16px;
+    overflow-x: auto;
+  }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    margin: 16px 0;
+  }
+  thead tr { background: #1a365d; color: #ffffff; }
+  th, td { padding: 11px 16px; text-align: left; }
+  tbody tr:nth-child(even) { background: #ebf8ff; }
+  tbody tr:hover { background: #bee3f8; transition: background 0.2s; }
+
+  /* ── Section divider ── */
+  hr {
+    border: none;
+    border-top: 2px dashed #bee3f8;
+    margin: 30px 0;
+  }
+
+  /* ── Caption ── */
+  .caption { text-align: center; font-style: italic; color: #718096; font-size: 0.88em; margin-top: -10px; }
+</style>
+```
+
+# Pendahuluan
+
+## Latar Belakang
+
+Keberhasilan operasional pada bisnis rental film tidak hanya bergantung pada koleksi 
+film yang tersedia, tetapi juga pada kemampuan manajemen dalam membaca dan 
+merespons pola perilaku pelanggan secara berbasis data. Tanpa analisis yang 
+sistematis, data transaksi hanya menjadi catatan pasif tanpa nilai strategis.
+
+Database **Sakila** merupakan sampel basis data relasional yang merepresentasikan 
+ekosistem toko rental film secara lengkap, mencakup data pelanggan, film, 
+inventaris, hingga rekaman pembayaran. Struktur relasionalnya yang kaya menjadikan 
+Sakila sebagai medium yang ideal untuk mengekstrak *business insight*.
+
+<div class="info-box">
+<strong>🎯 Pertanyaan Penelitian</strong>
+
+1. Kategori film mana yang paling sering disewa dan menghasilkan pendapatan tertinggi?
+2. Seberapa kuat hubungan antara frekuensi penyewaan dan total pendapatan per kategori?
+3. Apakah durasi film berpengaruh signifikan terhadap pendapatan?
+4. Bagaimana pola tren penyewaan berfluktuasi dari waktu ke waktu?
+</div>
+
+## Struktur Database Sakila (Relevan)
+
+Tabel-tabel yang digunakan dalam analisis ini:
+
+| Tabel | Deskripsi |
+|---|---|
+| `film` | Informasi detail setiap film |
+| `film_category` | Relasi film dengan kategori |
+| `category` | Nama kategori film |
+| `inventory` | Stok film di setiap toko |
+| `rental` | Transaksi penyewaan |
+| `payment` | Data pembayaran penyewaan |
+
+---
+
+# Persiapan Data
+
+## Instalasi & Pemuatan Package
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo    = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.align = "center",
+  fig.width  = 9,
+  fig.height = 5.5,
+  dpi = 150
+)
+```
+
+```{r load-packages}
+# Instalasi package jika belum tersedia
+required_packages <- c("RMySQL", "DBI", "dplyr", "ggplot2",
+                        "scales", "tidyr", "lubridate",
+                        "ggthemes", "knitr", "kableExtra",
+                        "viridis", "ggcorrplot", "broom")
+
+new_pkg <- required_packages[!(required_packages %in% installed.packages()[,"Package"])]
+if (length(new_pkg)) install.packages(new_pkg, repos = "https://cran.rstudio.com/")
+
+library(RMySQL)
+library(DBI)
+library(dplyr)
+library(ggplot2)
+library(scales)
+library(tidyr)
+library(lubridate)
+library(ggthemes)
+library(knitr)
+library(kableExtra)
+library(viridis)
+library(ggcorrplot)
+library(broom)
+```
+
+## Koneksi Database Sakila
+
+```{r koneksi-db}
+# Koneksi ke database Sakila
+con <- dbConnect(
+  RMySQL::MySQL(),
+  dbname   = "sakila",
+  host     = "127.0.0.1",
+  port     = 3306,
+  user     = "root",
+  password = "laiastatistika"  
+)
+
+# Cek daftar tabel
+cat("Tabel yang tersedia di database Sakila:\n")
+dbListTables(con)
+```
+
+## Pengambilan Data
+
+```{r query-data}
+# ── Query 1: Pendapatan & jumlah rental per kategori ──────────────────────────
+query_kategori <- "
+  SELECT
+    c.name                          AS kategori,
+    COUNT(r.rental_id)              AS jumlah_rental,
+    SUM(p.amount)                   AS total_pendapatan,
+    ROUND(AVG(p.amount), 2)         AS rata_pendapatan,
+    COUNT(DISTINCT f.film_id)       AS jumlah_film
+  FROM category        c
+  JOIN film_category   fc ON c.category_id = fc.category_id
+  JOIN film            f  ON fc.film_id    = f.film_id
+  JOIN inventory       i  ON f.film_id     = i.film_id
+  JOIN rental          r  ON i.inventory_id = r.inventory_id
+  JOIN payment         p  ON r.rental_id   = p.rental_id
+  GROUP BY c.name
+  ORDER BY total_pendapatan DESC
+"
+df_kategori <- dbGetQuery(con, query_kategori)
+
+# ── Query 2: Tren rental bulanan ──────────────────────────────────────────────
+query_bulanan <- "
+  SELECT
+    DATE_FORMAT(r.rental_date, '%Y-%m') AS bulan,
+    COUNT(r.rental_id)                  AS jumlah_rental,
+    SUM(p.amount)                       AS total_pendapatan
+  FROM rental  r
+  JOIN payment p ON r.rental_id = p.rental_id
+  GROUP BY bulan
+  ORDER BY bulan
+"
+df_bulanan <- dbGetQuery(con, query_bulanan)
+
+# ── Query 3: Hubungan durasi film dengan pendapatan ──────────────────────────
+query_durasi <- "
+  SELECT
+    f.film_id,
+    f.title,
+    f.length          AS durasi_menit,
+    f.rental_rate,
+    f.rating,
+    COUNT(r.rental_id) AS jumlah_rental,
+    SUM(p.amount)      AS total_pendapatan
+  FROM film        f
+  JOIN inventory   i ON f.film_id      = i.film_id
+  JOIN rental      r ON i.inventory_id = r.inventory_id
+  JOIN payment     p ON r.rental_id    = p.rental_id
+  GROUP BY f.film_id, f.title, f.length, f.rental_rate, f.rating
+"
+df_durasi <- dbGetQuery(con, query_durasi)
+
+# Tutup koneksi
+dbDisconnect(con)
+
+cat("Data berhasil diambil!\n")
+cat("Jumlah baris df_kategori :", nrow(df_kategori), "\n")
+cat("Jumlah baris df_bulanan  :", nrow(df_bulanan),  "\n")
+cat("Jumlah baris df_durasi   :", nrow(df_durasi),   "\n")
+```
+
+---
+
+# Eksplorasi Data (EDA)
+
+## Ringkasan Statistik
+
+```{r ringkasan}
+# Konversi tipe data
+df_kategori$total_pendapatan <- as.numeric(df_kategori$total_pendapatan)
+df_kategori$jumlah_rental    <- as.integer(df_kategori$jumlah_rental)
+df_bulanan$bulan             <- as.Date(paste0(df_bulanan$bulan, "-01"))
+df_bulanan$total_pendapatan  <- as.numeric(df_bulanan$total_pendapatan)
+df_durasi$total_pendapatan   <- as.numeric(df_durasi$total_pendapatan)
+df_durasi$durasi_menit       <- as.integer(df_durasi$durasi_menit)
+
+# Ringkasan df_kategori
+kable(df_kategori,
+      caption = "Tabel 1. Performa Rental per Kategori Film",
+      col.names = c("Kategori", "Jumlah Rental", "Total Pendapatan ($)",
+                    "Rata-rata Pendapatan ($)", "Jumlah Film"),
+      align = c("l","r","r","r","r"),
+      format.args = list(big.mark = ",")) |>
+  kable_styling(bootstrap_options = c("striped","hover","condensed"),
+                full_width = TRUE) |>
+  row_spec(1, bold = TRUE, background = "#d4edda") |>
+  column_spec(3, color = "white", background = "#2b6cb0")
+```
+
+## Statistik Deskriptif
+
+```{r stats-deskriptif}
+desc_stats <- df_durasi |>
+  summarise(
+    N             = n(),
+    Rata_Durasi   = round(mean(durasi_menit), 2),
+    SD_Durasi     = round(sd(durasi_menit),   2),
+    Min_Durasi    = min(durasi_menit),
+    Max_Durasi    = max(durasi_menit),
+    Rata_Pendapatan = round(mean(total_pendapatan), 2),
+    SD_Pendapatan   = round(sd(total_pendapatan),   2),
+    Median_Pendapatan = round(median(total_pendapatan), 2)
+  )
+
+kable(t(desc_stats),
+      col.names = c("Nilai"),
+      caption   = "Tabel 2. Statistik Deskriptif Data Film") |>
+  kable_styling(bootstrap_options = c("striped","hover"),
+                full_width = FALSE, position = "center")
+```
+
+<div class="metric-row">
+<div class="metric-card">
+  <div class="value">`r nrow(df_durasi)`</div>
+  <div class="label">Total Film Dianalisis</div>
+</div>
+<div class="metric-card green">
+  <div class="value">`r nrow(df_kategori)`</div>
+  <div class="label">Kategori Film</div>
+</div>
+<div class="metric-card orange">
+  <div class="value">`r format(sum(df_kategori$jumlah_rental), big.mark=",")`</div>
+  <div class="label">Total Transaksi Rental</div>
+</div>
+<div class="metric-card purple">
+  <div class="value">$`r format(round(sum(df_kategori$total_pendapatan),0), big.mark=",")`</div>
+  <div class="label">Total Pendapatan</div>
+</div>
+</div>
+
+---
+
+# Visualisasi & Analisis Data
+
+## Analisis 1 — Pendapatan per Kategori Film
+
+### Visualisasi
+
+```{r plot-kategori, fig.cap="Gambar 1. Total Pendapatan per Kategori Film (diurutkan menurun)"}
+# Urutkan berdasarkan pendapatan
+df_kat_sorted <- df_kategori |>
+  arrange(total_pendapatan) |>
+  mutate(kategori = factor(kategori, levels = kategori))
+
+ggplot(df_kat_sorted, aes(x = total_pendapatan, y = kategori, fill = total_pendapatan)) +
+  geom_col(width = 0.7, show.legend = FALSE) +
+  geom_text(aes(label = paste0("$", comma(round(total_pendapatan, 0)))),
+            hjust = -0.08, size = 3.2, color = "#1a365d", fontface = "bold") +
+  scale_fill_viridis_c(option = "plasma", direction = -1) +
+  scale_x_continuous(labels = dollar_format(),
+                     expand = expansion(mult = c(0, 0.18))) +
+  labs(
+    title    = "Total Pendapatan per Kategori Film",
+    subtitle = "Database Sakila — Seluruh Periode Transaksi",
+    x        = "Total Pendapatan (USD)",
+    y        = NULL,
+    caption  = "Sumber: Database Sakila (MySQL)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title    = element_text(face = "bold", size = 14, color = "#1a365d"),
+    plot.subtitle = element_text(color = "#718096", size = 11),
+    axis.text.y   = element_text(face = "bold"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor   = element_blank(),
+    plot.caption  = element_text(color = "#a0aec0", size = 9)
+  )
+```
+
+### Interpretasi
+
+<div class="success-box">
+Berdasarkan diagram batang horizontal di atas:
+
+Grafik menunjukkan bahwa kategori film **Sports** memiliki total pendapatan tertinggi sebesar **$5.314**, sehingga menjadi kategori paling diminati pelanggan. Sebaliknya, kategori **Music** memiliki pendapatan terendah sebesar **$3.418**. Secara umum, sebagian besar kategori memiliki pendapatan yang relatif stabil di kisaran **$4.000–$5.000**, yang menandakan distribusi pendapatan antar kategori cukup merata.
+
+</div>
+
+---
+
+## Analisis 2 — Frekuensi Rental vs. Pendapatan
+
+### Visualisasi
+
+```{r plot-bubble, fig.cap="Gambar 2. Perbandingan Frekuensi Rental dan Total Pendapatan per Kategori"}
+ggplot(df_kategori,
+       aes(x = jumlah_rental, y = total_pendapatan,
+           size = jumlah_film, color = kategori, label = kategori)) +
+  geom_point(alpha = 0.75) +
+  geom_text(size = 2.8, vjust = -1.2, fontface = "bold", show.legend = FALSE) +
+  scale_size_continuous(range = c(5, 18), name = "Jumlah Film") +
+  scale_color_viridis_d(option = "turbo") +
+  scale_x_continuous(labels = comma) +
+  scale_y_continuous(labels = dollar_format()) +
+  labs(
+    title    = "Frekuensi Rental vs. Total Pendapatan per Kategori",
+    subtitle = "Ukuran gelembung = Jumlah film dalam kategori",
+    x        = "Jumlah Transaksi Rental",
+    y        = "Total Pendapatan (USD)",
+    caption  = "Sumber: Database Sakila (MySQL)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title    = element_text(face = "bold", size = 14, color = "#1a365d"),
+    plot.subtitle = element_text(color = "#718096"),
+    legend.position = "right"
+  )
+```
+
+### Interpretasi
+
+<div class="success-box">
+Diagram gelembung (*bubble chart*) memperlihatkan sebaran hubungan antara 
+frekuensi rental dan pendapatan per kategori:
+
+- Secara visual, kategori dengan jumlah rental lebih tinggi cenderung menghasilkan 
+  pendapatan yang lebih besar — namun kecenderungan ini bersifat **deskriptif** 
+  dan belum diuji secara statistik.
+- **Sports** dan **Animation** menempati posisi unggul baik dari sisi frekuensi 
+  maupun pendapatan, menjadikannya kategori prioritas dari perspektif bisnis.
+- Ukuran gelembung yang merepresentasikan jumlah film dalam kategori tidak 
+  menunjukkan pola yang konsisten terhadap pendapatan — mengindikasikan bahwa 
+  **popularitas film lebih menentukan pendapatan daripada banyaknya judul** yang 
+  tersedia dalam satu kategori.
+</div>
+
+---
+
+## Analisis 3 — Tren Rental Bulanan
+
+### Visualisasi
+
+```{r plot-tren, fig.cap="Gambar 3. Tren Jumlah Rental dan Pendapatan Bulanan"}
+# Normalisasi untuk dual-axis
+scale_factor <- max(df_bulanan$total_pendapatan) / max(df_bulanan$jumlah_rental)
+ggplot(df_bulanan, aes(x = bulan)) +
+  geom_area(aes(y = total_pendapatan), fill = "#3182ce", alpha = 0.20) +
+  geom_line(aes(y = total_pendapatan, color = "Total Pendapatan (USD)"),
+            linewidth = 1.3) +
+  geom_line(aes(y = jumlah_rental * scale_factor, color = "Jumlah Rental"),
+            linewidth = 1.3, linetype = "dashed") +
+  geom_point(aes(y = total_pendapatan, color = "Total Pendapatan (USD)"),
+             size = 2.8) +
+  geom_point(aes(y = jumlah_rental * scale_factor, color = "Jumlah Rental"),
+             size = 2.8) +
+  scale_color_manual(values = c("Total Pendapatan (USD)" = "#2b6cb0",
+                                 "Jumlah Rental"          = "#dd6b20")) +
+  scale_y_continuous(
+    name   = "Total Pendapatan (USD)",
+    labels = dollar_format(),
+    sec.axis = sec_axis(~ . / scale_factor, name = "Jumlah Rental",
+                        labels = comma)
+  ) +
+  scale_x_date(date_labels = "%b %Y", date_breaks = "1 month") +
+  labs(
+    title    = "Tren Bulanan: Jumlah Rental & Pendapatan",
+    subtitle = "Perbandingan volume transaksi dan pendapatan sepanjang waktu",
+    x        = "Periode",
+    color    = "Metrik",
+    caption  = "Sumber: Database Sakila (MySQL)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title    = element_text(face = "bold", size = 14, color = "#1a365d"),
+    plot.subtitle = element_text(color = "#718096"),
+    axis.text.x   = element_text(angle = 45, hjust = 1),
+    legend.position = "top"
+  )
+```
+
+### Interpretasi
+
+<div class="success-box">
+- Tren rental menunjukkan pola **fluktuasi musiman** dengan puncak transaksi 
+  terjadi pada pertengahan tahun, kemudian menurun secara bertahap menjelang 
+  akhir periode.
+- Garis pendapatan dan jumlah rental bergerak **hampir sejajar** sepanjang waktu, 
+  mengindikasikan bahwa harga per rental relatif konsisten dan tidak banyak 
+  berubah antar periode.
+- Penurunan signifikan menjelang akhir periode kemungkinan disebabkan oleh 
+  **data yang tidak lengkap** pada bulan terakhir (*partial month*), sehingga 
+  perlu kehati-hatian dalam menginterpretasikan tren di ujung periode tersebut.
+</div>
+
+---
+
+## Analisis 4 — Hubungan Durasi Film dengan Pendapatan
+
+### Landasan Teori & Persamaan Matematis
+
+Untuk mengukur kekuatan hubungan linear antara durasi film ($X$) dan total pendapatan ($Y$), digunakan **Koefisien Korelasi Pearson**:
+
+$$
+r = \frac{\sum_{i=1}^{n}(X_i - \bar{X})(Y_i - \bar{Y})}
+         {\sqrt{\sum_{i=1}^{n}(X_i - \bar{X})^2 \cdot \sum_{i=1}^{n}(Y_i - \bar{Y})^2}}
+$$
+
+di mana $r \in [-1, 1]$. Nilai $r$ mendekati 1 berarti korelasi positif kuat, mendekati -1 berarti korelasi negatif kuat, dan mendekati 0 berarti tidak ada korelasi linear.
+
+Selanjutnya dilakukan **Regresi Linear Sederhana** dengan model:
+
+$$
+\hat{Y}_i = \beta_0 + \beta_1 X_i + \varepsilon_i, \quad \varepsilon_i \sim \mathcal{N}(0, \sigma^2)
+$$
+
+Estimasi koefisien menggunakan metode *Ordinary Least Squares* (OLS):
+
+$$
+\hat{\beta}_1 = \frac{\sum_{i=1}^{n}(X_i - \bar{X})(Y_i - \bar{Y})}{\sum_{i=1}^{n}(X_i - \bar{X})^2}, \qquad
+\hat{\beta}_0 = \bar{Y} - \hat{\beta}_1\bar{X}
+$$
+
+Koefisien determinasi $R^2$ mengukur proporsi variansi $Y$ yang dijelaskan model:
+
+$$
+R^2 = 1 - \frac{\text{SS}_{\text{res}}}{\text{SS}_{\text{tot}}} = 1 - \frac{\sum(Y_i - \hat{Y}_i)^2}{\sum(Y_i - \bar{Y})^2}
+$$
+
+### Uji Korelasi
+
+```{r uji-korelasi}
+# Korelasi Pearson
+cor_result <- cor.test(df_durasi$durasi_menit, df_durasi$total_pendapatan,
+                       method = "pearson")
+
+cat("=== Hasil Uji Korelasi Pearson ===\n")
+cat("r         :", round(cor_result$estimate, 4), "\n")
+cat("t-statistik:", round(cor_result$statistic, 4), "\n")
+cat("p-value   :", format(cor_result$p.value, scientific = TRUE), "\n")
+cat("95% CI    : [", round(cor_result$conf.int[1], 4), ",",
+                     round(cor_result$conf.int[2], 4), "]\n")
+```
+
+### Regresi Linear
+
+```{r regresi}
+# Model regresi linear sederhana
+model_lm <- lm(total_pendapatan ~ durasi_menit, data = df_durasi)
+summary_lm <- summary(model_lm)
+
+# Tampilkan koefisien
+kable(tidy(model_lm),
+      digits  = 4,
+      caption = "Tabel 3. Hasil Estimasi Regresi Linear (Pendapatan ~ Durasi Film)",
+      col.names = c("Term", "Estimasi", "Std. Error", "t-Statistik", "p-value")) |>
+  kable_styling(bootstrap_options = c("striped","hover"), full_width = FALSE,
+                position = "center")
+
+cat("\nR-squared :", round(summary_lm$r.squared, 4))
+cat("\nAdj. R²   :", round(summary_lm$adj.r.squared, 4))
+```
+
+### Visualisasi Regresi
+
+```{r plot-regresi, fig.cap="Gambar 4. Scatter Plot Durasi Film vs. Total Pendapatan dengan Garis Regresi"}
+ggplot(df_durasi, aes(x = durasi_menit, y = total_pendapatan)) +
+  geom_point(aes(color = rating), alpha = 0.5, size = 2) +
+  geom_smooth(method = "lm", se = TRUE, color = "#1a365d",
+              fill = "#bee3f8", linewidth = 1.2) +
+  scale_color_viridis_d(option = "plasma", name = "Rating Film") +
+  scale_y_continuous(labels = dollar_format()) +
+  annotate("text",
+           x = max(df_durasi$durasi_menit) * 0.75,
+           y = max(df_durasi$total_pendapatan) * 0.92,
+           label = paste0("r = ", round(cor_result$estimate, 3),
+                          "\nR² = ", round(summary_lm$r.squared, 3)),
+           size = 4, color = "#1a365d", fontface = "bold",
+           hjust = 0, vjust = 1,
+           box.padding = unit(0.4, "lines")) +
+  labs(
+    title    = "Hubungan Durasi Film dan Total Pendapatan",
+    subtitle = "Titik diwarnai berdasarkan rating film; garis biru = regresi OLS",
+    x        = "Durasi Film (menit)",
+    y        = "Total Pendapatan (USD)",
+    caption  = "Sumber: Database Sakila (MySQL)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title    = element_text(face = "bold", size = 14, color = "#1a365d"),
+    plot.subtitle = element_text(color = "#718096"),
+    legend.position = "right"
+  )
+```
+
+### Interpretasi
+
+<div class="success-box">
+**Hasil Korelasi & Regresi:**
+
+- Unit analisis adalah **per film**, dengan nilai pendapatan merupakan agregasi 
+  seluruh transaksi rental tiap judul.
+- Nilai $r \approx$ `r round(cor_result$estimate, 3)` dan 
+  $R^2 \approx$ `r round(summary_lm$r.squared, 3)` menunjukkan bahwa durasi 
+  film **hampir tidak berkorelasi** dengan pendapatan yang dihasilkan.
+- Durasi film hanya menjelaskan `r round(summary_lm$r.squared * 100, 1)`% 
+  variasi pendapatan — faktor lain seperti popularitas film, harga rental, 
+  dan ketersediaan stok jauh lebih menentukan.
+</div>
+
+<div class="warning-box">
+⚠️ *P-value* yang kecil di sini bukan berarti hubungannya penting secara 
+praktis. Dengan $n$ = `r nrow(df_durasi)` observasi, uji statistik sangat 
+sensitif dan bisa mendeteksi efek sekecil apapun. Analisis multivariat 
+diperlukan untuk gambaran yang lebih lengkap.
+</div>
+
+---
+
+# Kesimpulan
+
+Berdasarkan seluruh analisis yang telah dilakukan terhadap database Sakila, dapat ditarik kesimpulan sebagai berikut:
+
+| No. | Temuan | Implikasi Bisnis |
+|---|---|---|
+| 1 | Kategori **Sports**, **Sci-Fi**, dan **Animation** mendominasi pendapatan | Prioritaskan stok dan promosi untuk kategori ini |
+| 2 | Korelasi positif kuat antara frekuensi rental dan pendapatan | Strategi diskon volume dapat meningkatkan transaksi |
+| 3 | Puncak transaksi terjadi pada pertengahan tahun | Siapkan stok dan staf ekstra pada periode tersebut |
+| 4 | Durasi film **tidak berkorelasi kuat** dengan pendapatan | Keputusan pembelian stok sebaiknya tidak didasarkan pada durasi |
+
+<div class="info-box">
+**📌 Rekomendasi Strategis:**
+
+1. Tingkatkan koleksi film kategori Sports, Sci-Fi, dan Animation.
+2. Lakukan kampanye marketing menjelang periode puncak (pertengahan tahun).
+3. Kaji ulang harga rental untuk kategori dengan permintaan tinggi.
+4. Lakukan analisis segmentasi pelanggan sebagai langkah lanjutan.
+</div>
+
+---

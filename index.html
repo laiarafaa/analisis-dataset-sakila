@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Laia Rafa Sulistyadi | NIM: M0724062 | Kelas: B" />
+
+<meta name="date" content="2026-05-26" />
+
+<title>Analisis Data Penyewaan Film pada Database Sakila sebagai Dasar Pengambilan Keputusan Manajerial</title>
+
+<script src="index_files/header-attrs-2.29/header-attrs.js"></script>
+<script src="index_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="index_files/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="index_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="index_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="index_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="index_files/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="index_files/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="index_files/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="index_files/navigation-1.1/tabsets.js"></script>
+<script src="index_files/navigation-1.1/codefolding.js"></script>
+<link href="index_files/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="index_files/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="index_files/kePrint-0.0.1/kePrint.js"></script>
+<link href="index_files/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #204a87; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #8f5902; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #204a87; font-weight: bold; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #ce5c00; font-weight: bold; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+.sourceCode .row {
+  width: 100%;
+}
+.sourceCode {
+  overflow-x: auto;
+}
+.code-folding-btn {
+  margin-right: -30px;
+}
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Analisis Data Penyewaan Film pada Database
+Sakila sebagai Dasar Pengambilan Keputusan Manajerial</h1>
+<h4 class="author">Laia Rafa Sulistyadi | NIM: M0724062 | Kelas: B</h4>
+<h4 class="date">26 May 2026</h4>
+
+</div>
+
+
+<style>
+  /* ── Google Font ── */
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Fira+Code&display=swap');
+
+  /* ── Global ── */
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: #2d3748;
+    background-color: #f7f9fc;
+    line-height: 1.75;
+  }
+
+  /* ── Navbar / TOC ── */
+  .navbar, #TOC {
+    background-color: #1a365d !important;
+    color: #ffffff;
+    border-radius: 8px;
+  }
+  #TOC a { color: #90cdf4; }
+  #TOC a:hover { color: #ffffff; text-decoration: none; }
+
+  /* ── Headings ── */
+  h1, h2, h3, h4 {
+    font-weight: 700;
+    color: #1a365d;
+  }
+  h1.title {
+    font-size: 2.2em;
+    text-align: center;
+    padding: 20px 0 5px;
+    border-bottom: 3px solid #3182ce;
+    color: #1a365d;
+  }
+  h1 { font-size: 1.8em; border-left: 5px solid #3182ce; padding-left: 12px; }
+  h2 { font-size: 1.4em; border-left: 4px solid #63b3ed; padding-left: 10px; }
+  h3 { font-size: 1.15em; color: #2b6cb0; }
+
+  /* ── Author / Date ── */
+  .author, .date {
+    text-align: center;
+    color: #718096;
+    font-size: 0.95em;
+    margin: 2px 0;
+  }
+
+  /* ── Info box ── */
+  .info-box {
+    background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+    border-left: 6px solid #3182ce;
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(49,130,206,0.10);
+  }
+  .info-box p { margin: 0; }
+
+  /* ── Warning box ── */
+  .warning-box {
+    background: #fffbeb;
+    border-left: 6px solid #d69e2e;
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin: 16px 0;
+  }
+
+  /* ── Success box ── */
+  .success-box {
+    background: #f0fff4;
+    border-left: 6px solid #38a169;
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin: 16px 0;
+  }
+
+  /* ── Metric cards ── */
+  .metric-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+  }
+  .metric-card {
+    flex: 1 1 160px;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 18px 20px;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    border-top: 4px solid #3182ce;
+  }
+  .metric-card .value {
+    font-size: 2em;
+    font-weight: 700;
+    color: #1a365d;
+  }
+  .metric-card .label {
+    font-size: 0.82em;
+    color: #718096;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .metric-card.green  { border-top-color: #38a169; }
+  .metric-card.orange { border-top-color: #dd6b20; }
+  .metric-card.purple { border-top-color: #805ad5; }
+
+  /* ── Code blocks ── */
+  pre, code {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.88em;
+    border-radius: 6px;
+  }
+  pre {
+    background: #1e2a3a;
+    color: #e2e8f0;
+    padding: 16px;
+    overflow-x: auto;
+  }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    margin: 16px 0;
+  }
+  thead tr { background: #1a365d; color: #ffffff; }
+  th, td { padding: 11px 16px; text-align: left; }
+  tbody tr:nth-child(even) { background: #ebf8ff; }
+  tbody tr:hover { background: #bee3f8; transition: background 0.2s; }
+
+  /* ── Section divider ── */
+  hr {
+    border: none;
+    border-top: 2px dashed #bee3f8;
+    margin: 30px 0;
+  }
+
+  /* ── Caption ── */
+  .caption { text-align: center; font-style: italic; color: #718096; font-size: 0.88em; margin-top: -10px; }
+</style>
+<div id="pendahuluan" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Pendahuluan</h1>
+<div id="latar-belakang" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> Latar Belakang</h2>
+<p>Keberhasilan operasional pada bisnis rental film tidak hanya
+bergantung pada koleksi film yang tersedia, tetapi juga pada kemampuan
+manajemen dalam membaca dan merespons pola perilaku pelanggan secara
+berbasis data. Tanpa analisis yang sistematis, data transaksi hanya
+menjadi catatan pasif tanpa nilai strategis.</p>
+<p>Database <strong>Sakila</strong> merupakan sampel basis data
+relasional yang merepresentasikan ekosistem toko rental film secara
+lengkap, mencakup data pelanggan, film, inventaris, hingga rekaman
+pembayaran. Struktur relasionalnya yang kaya menjadikan Sakila sebagai
+medium yang ideal untuk mengekstrak <em>business insight</em>.</p>
+<div class="info-box">
+<p><strong>🎯 Pertanyaan Penelitian</strong></p>
+<ol style="list-style-type: decimal">
+<li>Kategori film mana yang paling sering disewa dan menghasilkan
+pendapatan tertinggi?</li>
+<li>Seberapa kuat hubungan antara frekuensi penyewaan dan total
+pendapatan per kategori?</li>
+<li>Apakah durasi film berpengaruh signifikan terhadap pendapatan?</li>
+<li>Bagaimana pola tren penyewaan berfluktuasi dari waktu ke waktu?</li>
+</ol>
+</div>
+</div>
+<div id="struktur-database-sakila-relevan" class="section level2"
+number="1.2">
+<h2><span class="header-section-number">1.2</span> Struktur Database
+Sakila (Relevan)</h2>
+<p>Tabel-tabel yang digunakan dalam analisis ini:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Tabel</th>
+<th>Deskripsi</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>film</code></td>
+<td>Informasi detail setiap film</td>
+</tr>
+<tr class="even">
+<td><code>film_category</code></td>
+<td>Relasi film dengan kategori</td>
+</tr>
+<tr class="odd">
+<td><code>category</code></td>
+<td>Nama kategori film</td>
+</tr>
+<tr class="even">
+<td><code>inventory</code></td>
+<td>Stok film di setiap toko</td>
+</tr>
+<tr class="odd">
+<td><code>rental</code></td>
+<td>Transaksi penyewaan</td>
+</tr>
+<tr class="even">
+<td><code>payment</code></td>
+<td>Data pembayaran penyewaan</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div>
+</div>
+<div id="persiapan-data" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Persiapan Data</h1>
+<div id="instalasi-pemuatan-package" class="section level2"
+number="2.1">
+<h2><span class="header-section-number">2.1</span> Instalasi &amp;
+Pemuatan Package</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># Instalasi package jika belum tersedia</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>required_packages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;RMySQL&quot;</span>, <span class="st">&quot;DBI&quot;</span>, <span class="st">&quot;dplyr&quot;</span>, <span class="st">&quot;ggplot2&quot;</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>                        <span class="st">&quot;scales&quot;</span>, <span class="st">&quot;tidyr&quot;</span>, <span class="st">&quot;lubridate&quot;</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>                        <span class="st">&quot;ggthemes&quot;</span>, <span class="st">&quot;knitr&quot;</span>, <span class="st">&quot;kableExtra&quot;</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>                        <span class="st">&quot;viridis&quot;</span>, <span class="st">&quot;ggcorrplot&quot;</span>, <span class="st">&quot;broom&quot;</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>new_pkg <span class="ot">&lt;-</span> required_packages[<span class="sc">!</span>(required_packages <span class="sc">%in%</span> <span class="fu">installed.packages</span>()[,<span class="st">&quot;Package&quot;</span>])]</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(new_pkg)) <span class="fu">install.packages</span>(new_pkg, <span class="at">repos =</span> <span class="st">&quot;https://cran.rstudio.com/&quot;</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="fu">library</span>(RMySQL)</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="fu">library</span>(DBI)</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="fu">library</span>(ggthemes)</span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="fu">library</span>(ggcorrplot)</span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="fu">library</span>(broom)</span></code></pre></div>
+</div>
+<div id="koneksi-database-sakila" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Koneksi Database
+Sakila</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Koneksi ke database Sakila</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>con <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  RMySQL<span class="sc">::</span><span class="fu">MySQL</span>(),</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="at">dbname   =</span> <span class="st">&quot;sakila&quot;</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  <span class="at">host     =</span> <span class="st">&quot;127.0.0.1&quot;</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  <span class="at">port     =</span> <span class="dv">3306</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  <span class="at">user     =</span> <span class="st">&quot;root&quot;</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  <span class="at">password =</span> <span class="st">&quot;laiastatistika&quot;</span>  </span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>)</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co"># Cek daftar tabel</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Tabel yang tersedia di database Sakila:</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Tabel yang tersedia di database Sakila:</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">dbListTables</span>(con)</span></code></pre></div>
+<pre><code>##  [1] &quot;actor&quot;                      &quot;actor_info&quot;                
+##  [3] &quot;address&quot;                    &quot;category&quot;                  
+##  [5] &quot;city&quot;                       &quot;country&quot;                   
+##  [7] &quot;customer&quot;                   &quot;customer_list&quot;             
+##  [9] &quot;film&quot;                       &quot;film_actor&quot;                
+## [11] &quot;film_category&quot;              &quot;film_list&quot;                 
+## [13] &quot;film_text&quot;                  &quot;inventory&quot;                 
+## [15] &quot;language&quot;                   &quot;nicer_but_slower_film_list&quot;
+## [17] &quot;payment&quot;                    &quot;rental&quot;                    
+## [19] &quot;sales_by_film_category&quot;     &quot;sales_by_store&quot;            
+## [21] &quot;staff&quot;                      &quot;staff_list&quot;                
+## [23] &quot;store&quot;</code></pre>
+</div>
+<div id="pengambilan-data" class="section level2" number="2.3">
+<h2><span class="header-section-number">2.3</span> Pengambilan Data</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># ── Query 1: Pendapatan &amp; jumlah rental per kategori ──────────────────────────</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>query_kategori <span class="ot">&lt;-</span> <span class="st">&quot;</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="st">  SELECT</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="st">    c.name                          AS kategori,</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="st">    COUNT(r.rental_id)              AS jumlah_rental,</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="st">    SUM(p.amount)                   AS total_pendapatan,</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="st">    ROUND(AVG(p.amount), 2)         AS rata_pendapatan,</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="st">    COUNT(DISTINCT f.film_id)       AS jumlah_film</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="st">  FROM category        c</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="st">  JOIN film_category   fc ON c.category_id = fc.category_id</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="st">  JOIN film            f  ON fc.film_id    = f.film_id</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="st">  JOIN inventory       i  ON f.film_id     = i.film_id</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="st">  JOIN rental          r  ON i.inventory_id = r.inventory_id</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="st">  JOIN payment         p  ON r.rental_id   = p.rental_id</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="st">  GROUP BY c.name</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="st">  ORDER BY total_pendapatan DESC</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="st">&quot;</span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a>df_kategori <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con, query_kategori)</span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co"># ── Query 2: Tren rental bulanan ──────────────────────────────────────────────</span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>query_bulanan <span class="ot">&lt;-</span> <span class="st">&quot;</span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="st">  SELECT</span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="st">    DATE_FORMAT(r.rental_date, &#39;%Y-%m&#39;) AS bulan,</span></span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="st">    COUNT(r.rental_id)                  AS jumlah_rental,</span></span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="st">    SUM(p.amount)                       AS total_pendapatan</span></span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a><span class="st">  FROM rental  r</span></span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a><span class="st">  JOIN payment p ON r.rental_id = p.rental_id</span></span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a><span class="st">  GROUP BY bulan</span></span>
+<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a><span class="st">  ORDER BY bulan</span></span>
+<span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a><span class="st">&quot;</span></span>
+<span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a>df_bulanan <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con, query_bulanan)</span>
+<span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a></span>
+<span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a><span class="co"># ── Query 3: Hubungan durasi film dengan pendapatan ──────────────────────────</span></span>
+<span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a>query_durasi <span class="ot">&lt;-</span> <span class="st">&quot;</span></span>
+<span id="cb6-35"><a href="#cb6-35" tabindex="-1"></a><span class="st">  SELECT</span></span>
+<span id="cb6-36"><a href="#cb6-36" tabindex="-1"></a><span class="st">    f.film_id,</span></span>
+<span id="cb6-37"><a href="#cb6-37" tabindex="-1"></a><span class="st">    f.title,</span></span>
+<span id="cb6-38"><a href="#cb6-38" tabindex="-1"></a><span class="st">    f.length          AS durasi_menit,</span></span>
+<span id="cb6-39"><a href="#cb6-39" tabindex="-1"></a><span class="st">    f.rental_rate,</span></span>
+<span id="cb6-40"><a href="#cb6-40" tabindex="-1"></a><span class="st">    f.rating,</span></span>
+<span id="cb6-41"><a href="#cb6-41" tabindex="-1"></a><span class="st">    COUNT(r.rental_id) AS jumlah_rental,</span></span>
+<span id="cb6-42"><a href="#cb6-42" tabindex="-1"></a><span class="st">    SUM(p.amount)      AS total_pendapatan</span></span>
+<span id="cb6-43"><a href="#cb6-43" tabindex="-1"></a><span class="st">  FROM film        f</span></span>
+<span id="cb6-44"><a href="#cb6-44" tabindex="-1"></a><span class="st">  JOIN inventory   i ON f.film_id      = i.film_id</span></span>
+<span id="cb6-45"><a href="#cb6-45" tabindex="-1"></a><span class="st">  JOIN rental      r ON i.inventory_id = r.inventory_id</span></span>
+<span id="cb6-46"><a href="#cb6-46" tabindex="-1"></a><span class="st">  JOIN payment     p ON r.rental_id    = p.rental_id</span></span>
+<span id="cb6-47"><a href="#cb6-47" tabindex="-1"></a><span class="st">  GROUP BY f.film_id, f.title, f.length, f.rental_rate, f.rating</span></span>
+<span id="cb6-48"><a href="#cb6-48" tabindex="-1"></a><span class="st">&quot;</span></span>
+<span id="cb6-49"><a href="#cb6-49" tabindex="-1"></a>df_durasi <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con, query_durasi)</span>
+<span id="cb6-50"><a href="#cb6-50" tabindex="-1"></a></span>
+<span id="cb6-51"><a href="#cb6-51" tabindex="-1"></a><span class="co"># Tutup koneksi</span></span>
+<span id="cb6-52"><a href="#cb6-52" tabindex="-1"></a><span class="fu">dbDisconnect</span>(con)</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Data berhasil diambil!</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Data berhasil diambil!</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Jumlah baris df_kategori :&quot;</span>, <span class="fu">nrow</span>(df_kategori), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Jumlah baris df_kategori : 16</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Jumlah baris df_bulanan  :&quot;</span>, <span class="fu">nrow</span>(df_bulanan),  <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Jumlah baris df_bulanan  : 5</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Jumlah baris df_durasi   :&quot;</span>, <span class="fu">nrow</span>(df_durasi),   <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Jumlah baris df_durasi   : 958</code></pre>
+<hr />
+</div>
+</div>
+<div id="eksplorasi-data-eda" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Eksplorasi Data
+(EDA)</h1>
+<div id="ringkasan-statistik" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Ringkasan
+Statistik</h2>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Konversi tipe data</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>df_kategori<span class="sc">$</span>total_pendapatan <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(df_kategori<span class="sc">$</span>total_pendapatan)</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>df_kategori<span class="sc">$</span>jumlah_rental    <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(df_kategori<span class="sc">$</span>jumlah_rental)</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>df_bulanan<span class="sc">$</span>bulan             <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">paste0</span>(df_bulanan<span class="sc">$</span>bulan, <span class="st">&quot;-01&quot;</span>))</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>df_bulanan<span class="sc">$</span>total_pendapatan  <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(df_bulanan<span class="sc">$</span>total_pendapatan)</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>df_durasi<span class="sc">$</span>total_pendapatan   <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(df_durasi<span class="sc">$</span>total_pendapatan)</span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>df_durasi<span class="sc">$</span>durasi_menit       <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(df_durasi<span class="sc">$</span>durasi_menit)</span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a><span class="co"># Ringkasan df_kategori</span></span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a><span class="fu">kable</span>(df_kategori,</span>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">&quot;Tabel 1. Performa Rental per Kategori Film&quot;</span>,</span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;Kategori&quot;</span>, <span class="st">&quot;Jumlah Rental&quot;</span>, <span class="st">&quot;Total Pendapatan ($)&quot;</span>,</span>
+<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a>                    <span class="st">&quot;Rata-rata Pendapatan ($)&quot;</span>, <span class="st">&quot;Jumlah Film&quot;</span>),</span>
+<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a>      <span class="at">align =</span> <span class="fu">c</span>(<span class="st">&quot;l&quot;</span>,<span class="st">&quot;r&quot;</span>,<span class="st">&quot;r&quot;</span>,<span class="st">&quot;r&quot;</span>,<span class="st">&quot;r&quot;</span>),</span>
+<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a>      <span class="at">format.args =</span> <span class="fu">list</span>(<span class="at">big.mark =</span> <span class="st">&quot;,&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">&quot;striped&quot;</span>,<span class="st">&quot;hover&quot;</span>,<span class="st">&quot;condensed&quot;</span>),</span>
+<span id="cb16-17"><a href="#cb16-17" tabindex="-1"></a>                <span class="at">full_width =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-18"><a href="#cb16-18" tabindex="-1"></a>  <span class="fu">row_spec</span>(<span class="dv">1</span>, <span class="at">bold =</span> <span class="cn">TRUE</span>, <span class="at">background =</span> <span class="st">&quot;#d4edda&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-19"><a href="#cb16-19" tabindex="-1"></a>  <span class="fu">column_spec</span>(<span class="dv">3</span>, <span class="at">color =</span> <span class="st">&quot;white&quot;</span>, <span class="at">background =</span> <span class="st">&quot;#2b6cb0&quot;</span>)</span></code></pre></div>
+<table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
+<caption>
+Tabel 1. Performa Rental per Kategori Film
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Kategori
+</th>
+<th style="text-align:right;">
+Jumlah Rental
+</th>
+<th style="text-align:right;">
+Total Pendapatan (<span class="math inline">\() &lt;/th&gt;
+   &lt;th style=&quot;text-align:right;&quot;&gt; Rata-rata Pendapatan
+(\)</span>)
+</th>
+<th style="text-align:right;">
+Jumlah Film
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;font-weight: bold;background-color: rgba(212, 237, 218, 255) !important;">
+Sports
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(212, 237, 218, 255) !important;">
+1,179
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(212, 237, 218, 255) !important;color: white !important;background-color: rgba(43, 108, 176, 255) !important;">
+5,314.21
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(212, 237, 218, 255) !important;">
+4.51
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(212, 237, 218, 255) !important;">
+73
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sci-Fi
+</td>
+<td style="text-align:right;">
+1,101
+</td>
+<td style="text-align:right;color: white !important;background-color: rgba(43, 108, 176, 255) !important;">
+4,756.98
+</td>
+<td style="text-align:right;">
+4.32
+</td>
+<td style="text-align:right;">
+59
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Animation
+</td>
+<td style="text-align:right;">
+1,166
+</td>
+<td style="text-align:right;color: white !important;background-color: rgba(43, 108, 176, 255) !important;">
+4,656.30
+</td>
+<td style="text-align:right;">
+3.99
+</td>
+<td style="text-align:right;">
+64
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Drama
+</td>
+<td style="text-align:right;">
+1,060
+</td>
+<td style="text-align:right;color: white !important;background-color: rgba(43, 108, 176, 255) !important;">
+4,587.39
+</td>
+<td style="text-align:right;">
+4.33
+</td>
+<td style="text-align:right;">
+61
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Comedy
+</td>
+<td style="text-align:right;">
+941
+</td>
+<td style="text-align:right;color: white !important;background-color: rgba(43, 108, 176, 255) !important;">
+4,383.58
+</td>
+<td style="text-align:right;">
+4.66
+</td>
+<td style="text-align:right;">
+56
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Action
+</td>
+<td style="text-align:right;">
+1,112
+</td>
+<td style="text-align:right;color: white !important;background-color: rgba(43, 108, 176, 255) !important;">
+4,375.85
+</td>
+<td style="text-align:right;">
+3.94
+</td>
+<td style="text-align:right;">
+61
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+New
+</td>
+<td style="text-align:right;">
+940
+</td>
+<td style="text-align:right;color: white !important;background-color: rgba(43, 108, 176, 255) !important;">
+4,351.62
+</td>
+<td style="text-align:right;">
+4.63
+</td>
+<td style="text-align:right;">
+60
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Games
+</td>
+<td style="text-align:right;">
+969
+</td>
+<td style="text-align:right;color: white !important;background-color: rgba(43, 108, 176, 255) !important;">
+4,281.33
+</td>
+<td style="text-align:right;">
+4.42
+</td>
+<td style="text-align:right;">
+58
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Foreign
+</td>
+<td style="text-align:right;">
+1,033
+</td>
+<td style="text-align:right;color: white !important;background-color: rgba(43, 108, 176, 255) !important;">
+4,270.67
+</td>
+<td style="text-align:right;">
+4.13
+</td>
+<td style="text-align:right;">
+67
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Family
+</td>
+<td style="text-align:right;">
+1,096
+</td>
+<td style="text-align:right;color: white !important;background-color: rgba(43, 108, 176, 255) !important;">
+4,226.07
+</td>
+<td style="text-align:right;">
+3.86
+</td>
+<td style="text-align:right;">
+67
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Documentary
+</td>
+<td style="text-align:right;">
+1,050
+</td>
+<td style="text-align:right;color: white !important;background-color: rgba(43, 108, 176, 255) !important;">
+4,217.52
+</td>
+<td style="text-align:right;">
+4.02
+</td>
+<td style="text-align:right;">
+63
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Horror
+</td>
+<td style="text-align:right;">
+846
+</td>
+<td style="text-align:right;color: white !important;background-color: rgba(43, 108, 176, 255) !important;">
+3,722.54
+</td>
+<td style="text-align:right;">
+4.40
+</td>
+<td style="text-align:right;">
+53
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Children
+</td>
+<td style="text-align:right;">
+945
+</td>
+<td style="text-align:right;color: white !important;background-color: rgba(43, 108, 176, 255) !important;">
+3,655.55
+</td>
+<td style="text-align:right;">
+3.87
+</td>
+<td style="text-align:right;">
+58
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Classics
+</td>
+<td style="text-align:right;">
+939
+</td>
+<td style="text-align:right;color: white !important;background-color: rgba(43, 108, 176, 255) !important;">
+3,639.59
+</td>
+<td style="text-align:right;">
+3.88
+</td>
+<td style="text-align:right;">
+54
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Travel
+</td>
+<td style="text-align:right;">
+837
+</td>
+<td style="text-align:right;color: white !important;background-color: rgba(43, 108, 176, 255) !important;">
+3,549.64
+</td>
+<td style="text-align:right;">
+4.24
+</td>
+<td style="text-align:right;">
+53
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Music
+</td>
+<td style="text-align:right;">
+830
+</td>
+<td style="text-align:right;color: white !important;background-color: rgba(43, 108, 176, 255) !important;">
+3,417.72
+</td>
+<td style="text-align:right;">
+4.12
+</td>
+<td style="text-align:right;">
+51
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="statistik-deskriptif" class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> Statistik
+Deskriptif</h2>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>desc_stats <span class="ot">&lt;-</span> df_durasi <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>    <span class="at">N             =</span> <span class="fu">n</span>(),</span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>    <span class="at">Rata_Durasi   =</span> <span class="fu">round</span>(<span class="fu">mean</span>(durasi_menit), <span class="dv">2</span>),</span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>    <span class="at">SD_Durasi     =</span> <span class="fu">round</span>(<span class="fu">sd</span>(durasi_menit),   <span class="dv">2</span>),</span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>    <span class="at">Min_Durasi    =</span> <span class="fu">min</span>(durasi_menit),</span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>    <span class="at">Max_Durasi    =</span> <span class="fu">max</span>(durasi_menit),</span>
+<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>    <span class="at">Rata_Pendapatan =</span> <span class="fu">round</span>(<span class="fu">mean</span>(total_pendapatan), <span class="dv">2</span>),</span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>    <span class="at">SD_Pendapatan   =</span> <span class="fu">round</span>(<span class="fu">sd</span>(total_pendapatan),   <span class="dv">2</span>),</span>
+<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a>    <span class="at">Median_Pendapatan =</span> <span class="fu">round</span>(<span class="fu">median</span>(total_pendapatan), <span class="dv">2</span>)</span>
+<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a>  )</span>
+<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">t</span>(desc_stats),</span>
+<span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;Nilai&quot;</span>),</span>
+<span id="cb17-15"><a href="#cb17-15" tabindex="-1"></a>      <span class="at">caption   =</span> <span class="st">&quot;Tabel 2. Statistik Deskriptif Data Film&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb17-16"><a href="#cb17-16" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">&quot;striped&quot;</span>,<span class="st">&quot;hover&quot;</span>),</span>
+<span id="cb17-17"><a href="#cb17-17" tabindex="-1"></a>                <span class="at">full_width =</span> <span class="cn">FALSE</span>, <span class="at">position =</span> <span class="st">&quot;center&quot;</span>)</span></code></pre></div>
+<table class="table table-striped table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Tabel 2. Statistik Deskriptif Data Film
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Nilai
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+958.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rata_Durasi
+</td>
+<td style="text-align:right;">
+115.49
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SD_Durasi
+</td>
+<td style="text-align:right;">
+40.47
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Min_Durasi
+</td>
+<td style="text-align:right;">
+46.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Max_Durasi
+</td>
+<td style="text-align:right;">
+185.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rata_Pendapatan
+</td>
+<td style="text-align:right;">
+70.36
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SD_Pendapatan
+</td>
+<td style="text-align:right;">
+42.29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Median_Pendapatan
+</td>
+<td style="text-align:right;">
+62.32
+</td>
+</tr>
+</tbody>
+</table>
+<div class="metric-row">
+<div class="metric-card">
+<div class="value">
+958
+</div>
+<div class="label">
+Total Film Dianalisis
+</div>
+</div>
+<div class="metric-card green">
+<div class="value">
+16
+</div>
+<div class="label">
+Kategori Film
+</div>
+</div>
+<div class="metric-card orange">
+<div class="value">
+16,044
+</div>
+<div class="label">
+Total Transaksi Rental
+</div>
+</div>
+<div class="metric-card purple">
+<div class="value">
+$67,407
+</div>
+<div class="label">
+Total Pendapatan
+</div>
+</div>
+</div>
+<hr />
+</div>
+</div>
+<div id="visualisasi-analisis-data" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Visualisasi &amp;
+Analisis Data</h1>
+<div id="analisis-1-pendapatan-per-kategori-film" class="section level2"
+number="4.1">
+<h2><span class="header-section-number">4.1</span> Analisis 1 —
+Pendapatan per Kategori Film</h2>
+<div id="visualisasi" class="section level3" number="4.1.1">
+<h3><span class="header-section-number">4.1.1</span> Visualisasi</h3>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="co"># Urutkan berdasarkan pendapatan</span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>df_kat_sorted <span class="ot">&lt;-</span> df_kategori <span class="sc">|&gt;</span></span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>  <span class="fu">arrange</span>(total_pendapatan) <span class="sc">|&gt;</span></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">kategori =</span> <span class="fu">factor</span>(kategori, <span class="at">levels =</span> kategori))</span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a><span class="fu">ggplot</span>(df_kat_sorted, <span class="fu">aes</span>(<span class="at">x =</span> total_pendapatan, <span class="at">y =</span> kategori, <span class="at">fill =</span> total_pendapatan)) <span class="sc">+</span></span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">width =</span> <span class="fl">0.7</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">&quot;$&quot;</span>, <span class="fu">comma</span>(<span class="fu">round</span>(total_pendapatan, <span class="dv">0</span>)))),</span>
+<span id="cb18-9"><a href="#cb18-9" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.08</span>, <span class="at">size =</span> <span class="fl">3.2</span>, <span class="at">color =</span> <span class="st">&quot;#1a365d&quot;</span>, <span class="at">fontface =</span> <span class="st">&quot;bold&quot;</span>) <span class="sc">+</span></span>
+<span id="cb18-10"><a href="#cb18-10" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_c</span>(<span class="at">option =</span> <span class="st">&quot;plasma&quot;</span>, <span class="at">direction =</span> <span class="sc">-</span><span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb18-11"><a href="#cb18-11" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels =</span> <span class="fu">dollar_format</span>(),</span>
+<span id="cb18-12"><a href="#cb18-12" tabindex="-1"></a>                     <span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.18</span>))) <span class="sc">+</span></span>
+<span id="cb18-13"><a href="#cb18-13" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb18-14"><a href="#cb18-14" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">&quot;Total Pendapatan per Kategori Film&quot;</span>,</span>
+<span id="cb18-15"><a href="#cb18-15" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Database Sakila — Seluruh Periode Transaksi&quot;</span>,</span>
+<span id="cb18-16"><a href="#cb18-16" tabindex="-1"></a>    <span class="at">x        =</span> <span class="st">&quot;Total Pendapatan (USD)&quot;</span>,</span>
+<span id="cb18-17"><a href="#cb18-17" tabindex="-1"></a>    <span class="at">y        =</span> <span class="cn">NULL</span>,</span>
+<span id="cb18-18"><a href="#cb18-18" tabindex="-1"></a>    <span class="at">caption  =</span> <span class="st">&quot;Sumber: Database Sakila (MySQL)&quot;</span></span>
+<span id="cb18-19"><a href="#cb18-19" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb18-20"><a href="#cb18-20" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
+<span id="cb18-21"><a href="#cb18-21" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb18-22"><a href="#cb18-22" tabindex="-1"></a>    <span class="at">plot.title    =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">&quot;bold&quot;</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">color =</span> <span class="st">&quot;#1a365d&quot;</span>),</span>
+<span id="cb18-23"><a href="#cb18-23" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">&quot;#718096&quot;</span>, <span class="at">size =</span> <span class="dv">11</span>),</span>
+<span id="cb18-24"><a href="#cb18-24" tabindex="-1"></a>    <span class="at">axis.text.y   =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">&quot;bold&quot;</span>),</span>
+<span id="cb18-25"><a href="#cb18-25" tabindex="-1"></a>    <span class="at">panel.grid.major.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb18-26"><a href="#cb18-26" tabindex="-1"></a>    <span class="at">panel.grid.minor   =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb18-27"><a href="#cb18-27" tabindex="-1"></a>    <span class="at">plot.caption  =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">&quot;#a0aec0&quot;</span>, <span class="at">size =</span> <span class="dv">9</span>)</span>
+<span id="cb18-28"><a href="#cb18-28" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="index_files/figure-html/plot-kategori-1.png" alt="Gambar 1. Total Pendapatan per Kategori Film (diurutkan menurun)" width="1350" />
+<p class="caption">
+Gambar 1. Total Pendapatan per Kategori Film (diurutkan menurun)
+</p>
+</div>
+</div>
+<div id="interpretasi" class="section level3" number="4.1.2">
+<h3><span class="header-section-number">4.1.2</span> Interpretasi</h3>
+<div class="success-box">
+<p>Berdasarkan diagram batang horizontal di atas:</p>
+<p>Grafik menunjukkan bahwa kategori film <strong>Sports</strong>
+memiliki total pendapatan tertinggi sebesar <strong>$5.314</strong>,
+sehingga menjadi kategori paling diminati pelanggan. Sebaliknya,
+kategori <strong>Music</strong> memiliki pendapatan terendah sebesar
+<strong>$3.418</strong>. Secara umum, sebagian besar kategori memiliki
+pendapatan yang relatif stabil di kisaran
+<strong>$4.000–$5.000</strong>, yang menandakan distribusi pendapatan
+antar kategori cukup merata.</p>
+</div>
+<hr />
+</div>
+</div>
+<div id="analisis-2-frekuensi-rental-vs.-pendapatan"
+class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Analisis 2 —
+Frekuensi Rental vs. Pendapatan</h2>
+<div id="visualisasi-1" class="section level3" number="4.2.1">
+<h3><span class="header-section-number">4.2.1</span> Visualisasi</h3>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">ggplot</span>(df_kategori,</span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> jumlah_rental, <span class="at">y =</span> total_pendapatan,</span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>           <span class="at">size =</span> jumlah_film, <span class="at">color =</span> kategori, <span class="at">label =</span> kategori)) <span class="sc">+</span></span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.75</span>) <span class="sc">+</span></span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">size =</span> <span class="fl">2.8</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">1.2</span>, <span class="at">fontface =</span> <span class="st">&quot;bold&quot;</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a>  <span class="fu">scale_size_continuous</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">18</span>), <span class="at">name =</span> <span class="st">&quot;Jumlah Film&quot;</span>) <span class="sc">+</span></span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a>  <span class="fu">scale_color_viridis_d</span>(<span class="at">option =</span> <span class="st">&quot;turbo&quot;</span>) <span class="sc">+</span></span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels =</span> comma) <span class="sc">+</span></span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> <span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
+<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">&quot;Frekuensi Rental vs. Total Pendapatan per Kategori&quot;</span>,</span>
+<span id="cb19-12"><a href="#cb19-12" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Ukuran gelembung = Jumlah film dalam kategori&quot;</span>,</span>
+<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a>    <span class="at">x        =</span> <span class="st">&quot;Jumlah Transaksi Rental&quot;</span>,</span>
+<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a>    <span class="at">y        =</span> <span class="st">&quot;Total Pendapatan (USD)&quot;</span>,</span>
+<span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a>    <span class="at">caption  =</span> <span class="st">&quot;Sumber: Database Sakila (MySQL)&quot;</span></span>
+<span id="cb19-16"><a href="#cb19-16" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb19-17"><a href="#cb19-17" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
+<span id="cb19-18"><a href="#cb19-18" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb19-19"><a href="#cb19-19" tabindex="-1"></a>    <span class="at">plot.title    =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">&quot;bold&quot;</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">color =</span> <span class="st">&quot;#1a365d&quot;</span>),</span>
+<span id="cb19-20"><a href="#cb19-20" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">&quot;#718096&quot;</span>),</span>
+<span id="cb19-21"><a href="#cb19-21" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;right&quot;</span></span>
+<span id="cb19-22"><a href="#cb19-22" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="index_files/figure-html/plot-bubble-1.png" alt="Gambar 2. Perbandingan Frekuensi Rental dan Total Pendapatan per Kategori" width="1350" />
+<p class="caption">
+Gambar 2. Perbandingan Frekuensi Rental dan Total Pendapatan per
+Kategori
+</p>
+</div>
+</div>
+<div id="interpretasi-1" class="section level3" number="4.2.2">
+<h3><span class="header-section-number">4.2.2</span> Interpretasi</h3>
+<div class="success-box">
+<p>Diagram gelembung (<em>bubble chart</em>) memperlihatkan sebaran
+hubungan antara frekuensi rental dan pendapatan per kategori:</p>
+<ul>
+<li>Secara visual, kategori dengan jumlah rental lebih tinggi cenderung
+menghasilkan pendapatan yang lebih besar — namun kecenderungan ini
+bersifat <strong>deskriptif</strong> dan belum diuji secara
+statistik.</li>
+<li><strong>Sports</strong> dan <strong>Animation</strong> menempati
+posisi unggul baik dari sisi frekuensi maupun pendapatan, menjadikannya
+kategori prioritas dari perspektif bisnis.</li>
+<li>Ukuran gelembung yang merepresentasikan jumlah film dalam kategori
+tidak menunjukkan pola yang konsisten terhadap pendapatan —
+mengindikasikan bahwa <strong>popularitas film lebih menentukan
+pendapatan daripada banyaknya judul</strong> yang tersedia dalam satu
+kategori.</li>
+</ul>
+</div>
+<hr />
+</div>
+</div>
+<div id="analisis-3-tren-rental-bulanan" class="section level2"
+number="4.3">
+<h2><span class="header-section-number">4.3</span> Analisis 3 — Tren
+Rental Bulanan</h2>
+<div id="visualisasi-2" class="section level3" number="4.3.1">
+<h3><span class="header-section-number">4.3.1</span> Visualisasi</h3>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="co"># Normalisasi untuk dual-axis</span></span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>scale_factor <span class="ot">&lt;-</span> <span class="fu">max</span>(df_bulanan<span class="sc">$</span>total_pendapatan) <span class="sc">/</span> <span class="fu">max</span>(df_bulanan<span class="sc">$</span>jumlah_rental)</span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a><span class="fu">ggplot</span>(df_bulanan, <span class="fu">aes</span>(<span class="at">x =</span> bulan)) <span class="sc">+</span></span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a>  <span class="fu">geom_area</span>(<span class="fu">aes</span>(<span class="at">y =</span> total_pendapatan), <span class="at">fill =</span> <span class="st">&quot;#3182ce&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.20</span>) <span class="sc">+</span></span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> total_pendapatan, <span class="at">color =</span> <span class="st">&quot;Total Pendapatan (USD)&quot;</span>),</span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a>            <span class="at">linewidth =</span> <span class="fl">1.3</span>) <span class="sc">+</span></span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> jumlah_rental <span class="sc">*</span> scale_factor, <span class="at">color =</span> <span class="st">&quot;Jumlah Rental&quot;</span>),</span>
+<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a>            <span class="at">linewidth =</span> <span class="fl">1.3</span>, <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>) <span class="sc">+</span></span>
+<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> total_pendapatan, <span class="at">color =</span> <span class="st">&quot;Total Pendapatan (USD)&quot;</span>),</span>
+<span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a>             <span class="at">size =</span> <span class="fl">2.8</span>) <span class="sc">+</span></span>
+<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> jumlah_rental <span class="sc">*</span> scale_factor, <span class="at">color =</span> <span class="st">&quot;Jumlah Rental&quot;</span>),</span>
+<span id="cb20-12"><a href="#cb20-12" tabindex="-1"></a>             <span class="at">size =</span> <span class="fl">2.8</span>) <span class="sc">+</span></span>
+<span id="cb20-13"><a href="#cb20-13" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;Total Pendapatan (USD)&quot;</span> <span class="ot">=</span> <span class="st">&quot;#2b6cb0&quot;</span>,</span>
+<span id="cb20-14"><a href="#cb20-14" tabindex="-1"></a>                                 <span class="st">&quot;Jumlah Rental&quot;</span>          <span class="ot">=</span> <span class="st">&quot;#dd6b20&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb20-15"><a href="#cb20-15" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
+<span id="cb20-16"><a href="#cb20-16" tabindex="-1"></a>    <span class="at">name   =</span> <span class="st">&quot;Total Pendapatan (USD)&quot;</span>,</span>
+<span id="cb20-17"><a href="#cb20-17" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">dollar_format</span>(),</span>
+<span id="cb20-18"><a href="#cb20-18" tabindex="-1"></a>    <span class="at">sec.axis =</span> <span class="fu">sec_axis</span>(<span class="sc">~</span> . <span class="sc">/</span> scale_factor, <span class="at">name =</span> <span class="st">&quot;Jumlah Rental&quot;</span>,</span>
+<span id="cb20-19"><a href="#cb20-19" tabindex="-1"></a>                        <span class="at">labels =</span> comma)</span>
+<span id="cb20-20"><a href="#cb20-20" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb20-21"><a href="#cb20-21" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(<span class="at">date_labels =</span> <span class="st">&quot;%b %Y&quot;</span>, <span class="at">date_breaks =</span> <span class="st">&quot;1 month&quot;</span>) <span class="sc">+</span></span>
+<span id="cb20-22"><a href="#cb20-22" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb20-23"><a href="#cb20-23" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">&quot;Tren Bulanan: Jumlah Rental &amp; Pendapatan&quot;</span>,</span>
+<span id="cb20-24"><a href="#cb20-24" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Perbandingan volume transaksi dan pendapatan sepanjang waktu&quot;</span>,</span>
+<span id="cb20-25"><a href="#cb20-25" tabindex="-1"></a>    <span class="at">x        =</span> <span class="st">&quot;Periode&quot;</span>,</span>
+<span id="cb20-26"><a href="#cb20-26" tabindex="-1"></a>    <span class="at">color    =</span> <span class="st">&quot;Metrik&quot;</span>,</span>
+<span id="cb20-27"><a href="#cb20-27" tabindex="-1"></a>    <span class="at">caption  =</span> <span class="st">&quot;Sumber: Database Sakila (MySQL)&quot;</span></span>
+<span id="cb20-28"><a href="#cb20-28" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb20-29"><a href="#cb20-29" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
+<span id="cb20-30"><a href="#cb20-30" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb20-31"><a href="#cb20-31" tabindex="-1"></a>    <span class="at">plot.title    =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">&quot;bold&quot;</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">color =</span> <span class="st">&quot;#1a365d&quot;</span>),</span>
+<span id="cb20-32"><a href="#cb20-32" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">&quot;#718096&quot;</span>),</span>
+<span id="cb20-33"><a href="#cb20-33" tabindex="-1"></a>    <span class="at">axis.text.x   =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),</span>
+<span id="cb20-34"><a href="#cb20-34" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;top&quot;</span></span>
+<span id="cb20-35"><a href="#cb20-35" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="index_files/figure-html/plot-tren-1.png" alt="Gambar 3. Tren Jumlah Rental dan Pendapatan Bulanan" width="1350" />
+<p class="caption">
+Gambar 3. Tren Jumlah Rental dan Pendapatan Bulanan
+</p>
+</div>
+</div>
+<div id="interpretasi-2" class="section level3" number="4.3.2">
+<h3><span class="header-section-number">4.3.2</span> Interpretasi</h3>
+<div class="success-box">
+<ul>
+<li>Tren rental menunjukkan pola <strong>fluktuasi musiman</strong>
+dengan puncak transaksi terjadi pada pertengahan tahun, kemudian menurun
+secara bertahap menjelang akhir periode.</li>
+<li>Garis pendapatan dan jumlah rental bergerak <strong>hampir
+sejajar</strong> sepanjang waktu, mengindikasikan bahwa harga per rental
+relatif konsisten dan tidak banyak berubah antar periode.</li>
+<li>Penurunan signifikan menjelang akhir periode kemungkinan disebabkan
+oleh <strong>data yang tidak lengkap</strong> pada bulan terakhir
+(<em>partial month</em>), sehingga perlu kehati-hatian dalam
+menginterpretasikan tren di ujung periode tersebut.</li>
+</ul>
+</div>
+<hr />
+</div>
+</div>
+<div id="analisis-4-hubungan-durasi-film-dengan-pendapatan"
+class="section level2" number="4.4">
+<h2><span class="header-section-number">4.4</span> Analisis 4 — Hubungan
+Durasi Film dengan Pendapatan</h2>
+<div id="landasan-teori-persamaan-matematis" class="section level3"
+number="4.4.1">
+<h3><span class="header-section-number">4.4.1</span> Landasan Teori
+&amp; Persamaan Matematis</h3>
+<p>Untuk mengukur kekuatan hubungan linear antara durasi film (<span
+class="math inline">\(X\)</span>) dan total pendapatan (<span
+class="math inline">\(Y\)</span>), digunakan <strong>Koefisien Korelasi
+Pearson</strong>:</p>
+<p><span class="math display">\[
+r = \frac{\sum_{i=1}^{n}(X_i - \bar{X})(Y_i - \bar{Y})}
+         {\sqrt{\sum_{i=1}^{n}(X_i - \bar{X})^2 \cdot \sum_{i=1}^{n}(Y_i
+- \bar{Y})^2}}
+\]</span></p>
+<p>di mana <span class="math inline">\(r \in [-1, 1]\)</span>. Nilai
+<span class="math inline">\(r\)</span> mendekati 1 berarti korelasi
+positif kuat, mendekati -1 berarti korelasi negatif kuat, dan mendekati
+0 berarti tidak ada korelasi linear.</p>
+<p>Selanjutnya dilakukan <strong>Regresi Linear Sederhana</strong>
+dengan model:</p>
+<p><span class="math display">\[
+\hat{Y}_i = \beta_0 + \beta_1 X_i + \varepsilon_i, \quad \varepsilon_i
+\sim \mathcal{N}(0, \sigma^2)
+\]</span></p>
+<p>Estimasi koefisien menggunakan metode <em>Ordinary Least Squares</em>
+(OLS):</p>
+<p><span class="math display">\[
+\hat{\beta}_1 = \frac{\sum_{i=1}^{n}(X_i - \bar{X})(Y_i -
+\bar{Y})}{\sum_{i=1}^{n}(X_i - \bar{X})^2}, \qquad
+\hat{\beta}_0 = \bar{Y} - \hat{\beta}_1\bar{X}
+\]</span></p>
+<p>Koefisien determinasi <span class="math inline">\(R^2\)</span>
+mengukur proporsi variansi <span class="math inline">\(Y\)</span> yang
+dijelaskan model:</p>
+<p><span class="math display">\[
+R^2 = 1 - \frac{\text{SS}_{\text{res}}}{\text{SS}_{\text{tot}}} = 1 -
+\frac{\sum(Y_i - \hat{Y}_i)^2}{\sum(Y_i - \bar{Y})^2}
+\]</span></p>
+</div>
+<div id="uji-korelasi" class="section level3" number="4.4.2">
+<h3><span class="header-section-number">4.4.2</span> Uji Korelasi</h3>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="co"># Korelasi Pearson</span></span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>cor_result <span class="ot">&lt;-</span> <span class="fu">cor.test</span>(df_durasi<span class="sc">$</span>durasi_menit, df_durasi<span class="sc">$</span>total_pendapatan,</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>                       <span class="at">method =</span> <span class="st">&quot;pearson&quot;</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;=== Hasil Uji Korelasi Pearson ===</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## === Hasil Uji Korelasi Pearson ===</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;r         :&quot;</span>, <span class="fu">round</span>(cor_result<span class="sc">$</span>estimate, <span class="dv">4</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## r         : -0.004</code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;t-statistik:&quot;</span>, <span class="fu">round</span>(cor_result<span class="sc">$</span>statistic, <span class="dv">4</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## t-statistik: -0.125</code></pre>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;p-value   :&quot;</span>, <span class="fu">format</span>(cor_result<span class="sc">$</span>p.value, <span class="at">scientific =</span> <span class="cn">TRUE</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## p-value   : 9.005671e-01</code></pre>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;95% CI    : [&quot;</span>, <span class="fu">round</span>(cor_result<span class="sc">$</span>conf.int[<span class="dv">1</span>], <span class="dv">4</span>), <span class="st">&quot;,&quot;</span>,</span>
+<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a>                     <span class="fu">round</span>(cor_result<span class="sc">$</span>conf.int[<span class="dv">2</span>], <span class="dv">4</span>), <span class="st">&quot;]</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## 95% CI    : [ -0.0674 , 0.0593 ]</code></pre>
+</div>
+<div id="regresi-linear" class="section level3" number="4.4.3">
+<h3><span class="header-section-number">4.4.3</span> Regresi Linear</h3>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="co"># Model regresi linear sederhana</span></span>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a>model_lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(total_pendapatan <span class="sc">~</span> durasi_menit, <span class="at">data =</span> df_durasi)</span>
+<span id="cb31-3"><a href="#cb31-3" tabindex="-1"></a>summary_lm <span class="ot">&lt;-</span> <span class="fu">summary</span>(model_lm)</span>
+<span id="cb31-4"><a href="#cb31-4" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" tabindex="-1"></a><span class="co"># Tampilkan koefisien</span></span>
+<span id="cb31-6"><a href="#cb31-6" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">tidy</span>(model_lm),</span>
+<span id="cb31-7"><a href="#cb31-7" tabindex="-1"></a>      <span class="at">digits  =</span> <span class="dv">4</span>,</span>
+<span id="cb31-8"><a href="#cb31-8" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">&quot;Tabel 3. Hasil Estimasi Regresi Linear (Pendapatan ~ Durasi Film)&quot;</span>,</span>
+<span id="cb31-9"><a href="#cb31-9" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;Term&quot;</span>, <span class="st">&quot;Estimasi&quot;</span>, <span class="st">&quot;Std. Error&quot;</span>, <span class="st">&quot;t-Statistik&quot;</span>, <span class="st">&quot;p-value&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb31-10"><a href="#cb31-10" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">&quot;striped&quot;</span>,<span class="st">&quot;hover&quot;</span>), <span class="at">full_width =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb31-11"><a href="#cb31-11" tabindex="-1"></a>                <span class="at">position =</span> <span class="st">&quot;center&quot;</span>)</span></code></pre></div>
+<table class="table table-striped table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Tabel 3. Hasil Estimasi Regresi Linear (Pendapatan ~ Durasi Film)
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Term
+</th>
+<th style="text-align:right;">
+Estimasi
+</th>
+<th style="text-align:right;">
+Std. Error
+</th>
+<th style="text-align:right;">
+t-Statistik
+</th>
+<th style="text-align:right;">
+p-value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+70.8495
+</td>
+<td style="text-align:right;">
+4.1355
+</td>
+<td style="text-align:right;">
+17.1322
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+durasi_menit
+</td>
+<td style="text-align:right;">
+-0.0042
+</td>
+<td style="text-align:right;">
+0.0338
+</td>
+<td style="text-align:right;">
+-0.1250
+</td>
+<td style="text-align:right;">
+0.9006
+</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">R-squared :&quot;</span>, <span class="fu">round</span>(summary_lm<span class="sc">$</span>r.squared, <span class="dv">4</span>))</span></code></pre></div>
+<pre><code>## 
+## R-squared : 0</code></pre>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">Adj. R²   :&quot;</span>, <span class="fu">round</span>(summary_lm<span class="sc">$</span>adj.r.squared, <span class="dv">4</span>))</span></code></pre></div>
+<pre><code>## 
+## Adj. R²   : -0.001</code></pre>
+</div>
+<div id="visualisasi-regresi" class="section level3" number="4.4.4">
+<h3><span class="header-section-number">4.4.4</span> Visualisasi
+Regresi</h3>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a><span class="fu">ggplot</span>(df_durasi, <span class="fu">aes</span>(<span class="at">x =</span> durasi_menit, <span class="at">y =</span> total_pendapatan)) <span class="sc">+</span></span>
+<span id="cb36-2"><a href="#cb36-2" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> rating), <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb36-3"><a href="#cb36-3" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">TRUE</span>, <span class="at">color =</span> <span class="st">&quot;#1a365d&quot;</span>,</span>
+<span id="cb36-4"><a href="#cb36-4" tabindex="-1"></a>              <span class="at">fill =</span> <span class="st">&quot;#bee3f8&quot;</span>, <span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb36-5"><a href="#cb36-5" tabindex="-1"></a>  <span class="fu">scale_color_viridis_d</span>(<span class="at">option =</span> <span class="st">&quot;plasma&quot;</span>, <span class="at">name =</span> <span class="st">&quot;Rating Film&quot;</span>) <span class="sc">+</span></span>
+<span id="cb36-6"><a href="#cb36-6" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> <span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
+<span id="cb36-7"><a href="#cb36-7" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>,</span>
+<span id="cb36-8"><a href="#cb36-8" tabindex="-1"></a>           <span class="at">x =</span> <span class="fu">max</span>(df_durasi<span class="sc">$</span>durasi_menit) <span class="sc">*</span> <span class="fl">0.75</span>,</span>
+<span id="cb36-9"><a href="#cb36-9" tabindex="-1"></a>           <span class="at">y =</span> <span class="fu">max</span>(df_durasi<span class="sc">$</span>total_pendapatan) <span class="sc">*</span> <span class="fl">0.92</span>,</span>
+<span id="cb36-10"><a href="#cb36-10" tabindex="-1"></a>           <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">&quot;r = &quot;</span>, <span class="fu">round</span>(cor_result<span class="sc">$</span>estimate, <span class="dv">3</span>),</span>
+<span id="cb36-11"><a href="#cb36-11" tabindex="-1"></a>                          <span class="st">&quot;</span><span class="sc">\n</span><span class="st">R² = &quot;</span>, <span class="fu">round</span>(summary_lm<span class="sc">$</span>r.squared, <span class="dv">3</span>)),</span>
+<span id="cb36-12"><a href="#cb36-12" tabindex="-1"></a>           <span class="at">size =</span> <span class="dv">4</span>, <span class="at">color =</span> <span class="st">&quot;#1a365d&quot;</span>, <span class="at">fontface =</span> <span class="st">&quot;bold&quot;</span>,</span>
+<span id="cb36-13"><a href="#cb36-13" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">vjust =</span> <span class="dv">1</span>,</span>
+<span id="cb36-14"><a href="#cb36-14" tabindex="-1"></a>           <span class="at">box.padding =</span> <span class="fu">unit</span>(<span class="fl">0.4</span>, <span class="st">&quot;lines&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb36-15"><a href="#cb36-15" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb36-16"><a href="#cb36-16" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">&quot;Hubungan Durasi Film dan Total Pendapatan&quot;</span>,</span>
+<span id="cb36-17"><a href="#cb36-17" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Titik diwarnai berdasarkan rating film; garis biru = regresi OLS&quot;</span>,</span>
+<span id="cb36-18"><a href="#cb36-18" tabindex="-1"></a>    <span class="at">x        =</span> <span class="st">&quot;Durasi Film (menit)&quot;</span>,</span>
+<span id="cb36-19"><a href="#cb36-19" tabindex="-1"></a>    <span class="at">y        =</span> <span class="st">&quot;Total Pendapatan (USD)&quot;</span>,</span>
+<span id="cb36-20"><a href="#cb36-20" tabindex="-1"></a>    <span class="at">caption  =</span> <span class="st">&quot;Sumber: Database Sakila (MySQL)&quot;</span></span>
+<span id="cb36-21"><a href="#cb36-21" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb36-22"><a href="#cb36-22" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
+<span id="cb36-23"><a href="#cb36-23" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb36-24"><a href="#cb36-24" tabindex="-1"></a>    <span class="at">plot.title    =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">&quot;bold&quot;</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">color =</span> <span class="st">&quot;#1a365d&quot;</span>),</span>
+<span id="cb36-25"><a href="#cb36-25" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">&quot;#718096&quot;</span>),</span>
+<span id="cb36-26"><a href="#cb36-26" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;right&quot;</span></span>
+<span id="cb36-27"><a href="#cb36-27" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="index_files/figure-html/plot-regresi-1.png" alt="Gambar 4. Scatter Plot Durasi Film vs. Total Pendapatan dengan Garis Regresi" width="1350" />
+<p class="caption">
+Gambar 4. Scatter Plot Durasi Film vs. Total Pendapatan dengan Garis
+Regresi
+</p>
+</div>
+</div>
+<div id="interpretasi-3" class="section level3" number="4.4.5">
+<h3><span class="header-section-number">4.4.5</span> Interpretasi</h3>
+<div class="success-box">
+<p><strong>Hasil Korelasi &amp; Regresi:</strong></p>
+<ul>
+<li>Unit analisis adalah <strong>per film</strong>, dengan nilai
+pendapatan merupakan agregasi seluruh transaksi rental tiap judul.</li>
+<li>Nilai <span class="math inline">\(r \approx\)</span> -0.004 dan
+<span class="math inline">\(R^2 \approx\)</span> 0 menunjukkan bahwa
+durasi film <strong>hampir tidak berkorelasi</strong> dengan pendapatan
+yang dihasilkan.</li>
+<li>Durasi film hanya menjelaskan 0% variasi pendapatan — faktor lain
+seperti popularitas film, harga rental, dan ketersediaan stok jauh lebih
+menentukan.</li>
+</ul>
+</div>
+<div class="warning-box">
+<p>⚠️ <em>P-value</em> yang kecil di sini bukan berarti hubungannya
+penting secara praktis. Dengan <span class="math inline">\(n\)</span> =
+958 observasi, uji statistik sangat sensitif dan bisa mendeteksi efek
+sekecil apapun. Analisis multivariat diperlukan untuk gambaran yang
+lebih lengkap.</p>
+</div>
+<hr />
+</div>
+</div>
+</div>
+<div id="kesimpulan" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Kesimpulan</h1>
+<p>Berdasarkan seluruh analisis yang telah dilakukan terhadap database
+Sakila, dapat ditarik kesimpulan sebagai berikut:</p>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>No.</th>
+<th>Temuan</th>
+<th>Implikasi Bisnis</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Kategori <strong>Sports</strong>, <strong>Sci-Fi</strong>, dan
+<strong>Animation</strong> mendominasi pendapatan</td>
+<td>Prioritaskan stok dan promosi untuk kategori ini</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Korelasi positif kuat antara frekuensi rental dan pendapatan</td>
+<td>Strategi diskon volume dapat meningkatkan transaksi</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Puncak transaksi terjadi pada pertengahan tahun</td>
+<td>Siapkan stok dan staf ekstra pada periode tersebut</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Durasi film <strong>tidak berkorelasi kuat</strong> dengan
+pendapatan</td>
+<td>Keputusan pembelian stok sebaiknya tidak didasarkan pada durasi</td>
+</tr>
+</tbody>
+</table>
+<div class="info-box">
+<p><strong>📌 Rekomendasi Strategis:</strong></p>
+<ol style="list-style-type: decimal">
+<li>Tingkatkan koleksi film kategori Sports, Sci-Fi, dan Animation.</li>
+<li>Lakukan kampanye marketing menjelang periode puncak (pertengahan
+tahun).</li>
+<li>Kaji ulang harga rental untuk kategori dengan permintaan
+tinggi.</li>
+<li>Lakukan analisis segmentasi pelanggan sebagai langkah lanjutan.</li>
+</ol>
+</div>
+<hr />
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
